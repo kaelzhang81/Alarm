@@ -21,8 +21,18 @@ mt_spec() ->
 	 {arei, {'AND', [bbe, {'NOT', bdi}]}}
 	].
 
+shieldalm(Alm, PL) ->
+	ok.
+
+find_val(Alm, PL) -> 
+	ok.
+
 %% 解析器
-pri_proc(SPEC, PL) -> ok.
+pri_proc([Alm | ShieldList], PL) -> 
+	case find_val(Alm, PL) of
+		1 -> NewPL = shieldalm(Alm, PL), pri_proc(ShieldList, NewPL);
+		0 -> pri_proc(ShieldList, PL)
+	end.
 
 %% 测试用例loflom = 0, ais = 1, lck =0, tim = 1, bbe = 1, bdi = 0
 test_proc() ->
