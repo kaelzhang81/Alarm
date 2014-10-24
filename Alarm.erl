@@ -27,7 +27,8 @@ clear(Alm) ->
 	io:format("clear(~p)~n", [Alm]).
 
 set_oh(Alm, Value) ->
-	OK.
+	put(Alm, true),
+	io:format("set_on(~p, ~p)~n", [Alm, Value]).
 
 %% 解析器
 % [ais,lck,tim,bbe,bdi] [{loflom, 0}, {ais, 1}, {lck, 0}, {tim, 1}, {bbe, 1}, {bdi, 0}]
@@ -54,9 +55,15 @@ pri_proc([{Alm, ShieldList} | T], PL) ->
 % {'AND', [bbe, {'NOT', bdi}]}
 logic_val(X, PL) when is_atom(X) ->
 	find_val(X, PL);
-logic_val({'NOT', R}, PL) ->
-	1- logic_val(R, PL);
+logic_val({'NOT', X}, PL) ->
+	1- logic_val(X, PL);
 logic_val({'AND', R}, PL) ->
+	Vals = [logic_val(X, PL) || X <- R],
+	case lists:member(0, Vals) of
+	 	true -> 1;
+	 	false -> 0
+	end;
+logic_val({'OR', R}, PL) ->
 	Vals = [logic_val(X, PL) || X <- R],
 	case lists:member(0, Vals) of
 	 	true -> 1;
