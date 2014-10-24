@@ -26,6 +26,9 @@ clear(Alm) ->
 	put(Alm, true),
 	io:format("clear(~p)~n", [Alm]).
 
+set_oh(Alm, Value) ->
+	OK.
+
 %% 解析器
 % [ais,lck,tim,bbe,bdi] [{loflom, 0}, {ais, 1}, {lck, 0}, {tim, 1}, {bbe, 1}, {bdi, 0}]
 shieldalms(ShieldList, PL) ->
@@ -39,6 +42,7 @@ find_val(Alm, PL) ->
 	{Alm, Value} = lists:keyfind(Alm, 1, PL),
 	Value.
 
+
 pri_proc([], PL) -> PL;
 pri_proc([{Alm, ShieldList} | T], PL) -> 
 	case find_val(Alm, PL) of
@@ -46,11 +50,33 @@ pri_proc([{Alm, ShieldList} | T], PL) ->
 		0 -> pri_proc(T, PL)
 	end.
 
+% {'OR', [loflom,ais,lck,tim]}
+% {'AND', [bbe, {'NOT', bdi}]}
+logic_val({'AND', R}, PL) ->
+	Vals = [logic_val(X, PL) || X <- R],
+	case lists:member(0, Vals) of
+	 	true -> 1;
+	 	false -> 0
+	end.
+
+% {aais, {'OR', [loflom,ais,lck,tim]}}
+mt_proc([], PL) -> PL;
+mt_proc([{Alm, Rule} | T], PL) ->
+	Value = logic_val(Rule, PL),
+	set_oh(Alm, Value),
+	mt_proc(T, PL).
+	
+
 %% 测试用例loflom = 0, ais = 1, lck =0, tim = 1, bbe = 1, bdi = 0
 test_proc() ->
 	PL = [{loflom, 0}, {ais, 1}, {lck, 0}, {tim, 1}, {bbe, 1}, {bdi, 0}],
 	NewPL = pri_proc(pri_spec(), PL),
 	ExpectPL = [{loflom, 0}, {ais, 1}, {lck, 0}, {tim, 0}, {bbe, 0}, {bdi, 0}],
-	?assertEqual(ExpectPL, NewPL).
+	?assertEqual(ExpectPL, NewPL),
+	?assertEqual(true, get(tim)),
+	?assertEqual(true, get(bbe)),
+	mt_proc(mt_spec(), NewPL).
 
-
+test_logic_val() ->
+PL = [{loflom, 0}, {ais, 1}, {lck, 0}, {tim, 1}, {bbe, 1}, {bdi, 0}],
+	?assertEqual(0, logic_val({'AND',[bbe, bdi]}, PL)).
