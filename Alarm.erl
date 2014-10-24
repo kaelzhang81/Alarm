@@ -21,17 +21,26 @@ mt_spec() ->
 	 {arei, {'AND', [bbe, {'NOT', bdi}]}}
 	].
 
-shieldalms(Alm, PL) ->
-	ok.
+%% 驱动API
+clear(Alm) ->
+	put(Alm, true),
+	io:format("clear(~p)~n", [Alm]).
 
-% {loflom, [ais,lck,tim,bbe,bdi]} [{loflom, 0}, {ais, 1}, {lck, 0}, {tim, 1}, {bbe, 1}, {bdi, 0}]
+%% 解析器
+% [ais,lck,tim,bbe,bdi] [{loflom, 0}, {ais, 1}, {lck, 0}, {tim, 1}, {bbe, 1}, {bdi, 0}]
+shieldalms(ShieldList, PL) ->
+	lists:foldl(fun(Alm, Prod) -> 
+			clear(Alm), lists:keyreplace(Alm, 1, Prod, {Alm, 0}) 
+		 end, PL, ShieldList).
+	
+
+% loflom [{loflom, 0}, {ais, 1}, {lck, 0}, {tim, 1}, {bbe, 1}, {bdi, 0}]
 find_val(Alm, PL) -> 
 	{Alm, Value} = lists:keyfind(Alm, 1, PL),
 	Value.
 
-%% 解析器
 pri_proc([], PL) -> PL;
-pri_proc([{Alm | ShieldList} | T], PL) -> 
+pri_proc([{Alm, ShieldList} | T], PL) -> 
 	case find_val(Alm, PL) of
 		1 -> NewPL = shieldalms(ShieldList, PL), pri_proc(T, NewPL);
 		0 -> pri_proc(T, PL)
