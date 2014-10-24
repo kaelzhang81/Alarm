@@ -21,19 +21,20 @@ mt_spec() ->
 	 {arei, {'AND', [bbe, {'NOT', bdi}]}}
 	].
 
-shieldalm(Alm, PL) ->
+shieldalms(Alm, PL) ->
 	ok.
 
 % {loflom, [ais,lck,tim,bbe,bdi]} [{loflom, 0}, {ais, 1}, {lck, 0}, {tim, 1}, {bbe, 1}, {bdi, 0}]
 find_val(Alm, PL) -> 
-	ok.
+	{Alm, Value} = lists:keyfind(Alm, 1, PL),
+	Value.
 
 %% 解析器
 pri_proc([], PL) -> PL;
-pri_proc([Alm | ShieldList], PL) -> 
+pri_proc([{Alm | ShieldList} | T], PL) -> 
 	case find_val(Alm, PL) of
-		1 -> NewPL = shieldalm(Alm, PL), pri_proc(ShieldList, NewPL);
-		0 -> pri_proc(ShieldList, PL)
+		1 -> NewPL = shieldalms(ShieldList, PL), pri_proc(T, NewPL);
+		0 -> pri_proc(T, PL)
 	end.
 
 %% 测试用例loflom = 0, ais = 1, lck =0, tim = 1, bbe = 1, bdi = 0
