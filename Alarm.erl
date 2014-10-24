@@ -52,6 +52,10 @@ pri_proc([{Alm, ShieldList} | T], PL) ->
 
 % {'OR', [loflom,ais,lck,tim]}
 % {'AND', [bbe, {'NOT', bdi}]}
+logic_val(X, PL) when is_atom(X) ->
+	find_val(X, PL);
+logic_val({'NOT', R}, PL) ->
+	1- logic_val(R, PL);
 logic_val({'AND', R}, PL) ->
 	Vals = [logic_val(X, PL) || X <- R],
 	case lists:member(0, Vals) of
@@ -78,5 +82,6 @@ test_proc() ->
 	mt_proc(mt_spec(), NewPL).
 
 test_logic_val() ->
-PL = [{loflom, 0}, {ais, 1}, {lck, 0}, {tim, 1}, {bbe, 1}, {bdi, 0}],
-	?assertEqual(0, logic_val({'AND',[bbe, bdi]}, PL)).
+	PL = [{loflom, 0}, {ais, 1}, {lck, 0}, {tim, 1}, {bbe, 1}, {bdi, 0}],
+	?assertEqual(0, logic_val({'AND',[bbe, bdi]}, PL)),
+	?assertEqual(1, logic_val({'AND',[bbe, {'NOT', bdi}]}, PL)).
