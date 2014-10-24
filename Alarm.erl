@@ -86,7 +86,9 @@ test_proc() ->
 	?assertEqual(ExpectPL, NewPL),
 	?assertEqual(true, get(tim)),
 	?assertEqual(true, get(bbe)),
-	mt_proc(mt_spec(), NewPL).
+	mt_proc(mt_spec(), NewPL),
+	?assertEqual(true, get(aais)),
+	?assertEqual(false, get(arei)).
 
 test_logic_val() ->
 	PL = [{loflom, 0}, {ais, 1}, {lck, 0}, {tim, 1}, {bbe, 1}, {bdi, 0}],
