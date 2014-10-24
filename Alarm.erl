@@ -10,5 +10,12 @@ pri_spec() ->
 	[{loflom, [ais,lck,tim,bbe,bdi]},
 	 {ais, [tim,bbe,bdi]},
 	 {lck, [tim,bbe,bdi]},
-	 {tim, [bbe,bdi]},
-	]
+	 {tim, [bbe,bdi]}
+	].
+
+% 1）	当产生loflom或者ais、lck、tim告警后，则产生aais告警；
+% 2）	当产生bbe告警，并且没有产生bdi告警，则生成arei告警。
+mt_spec() ->
+	[{aais, {'OR', [loflom,ais,lck,tim]}},
+	 {arei, {'AND', [bbe, {'NOT', bdi}]}}
+	].
