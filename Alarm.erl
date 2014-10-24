@@ -1,4 +1,5 @@
 -module(alarm).
+-include_lib("eunit/include/eunit.hrl").
 -comple(export_all).
 
 %% 领域模型
@@ -19,3 +20,15 @@ mt_spec() ->
 	[{aais, {'OR', [loflom,ais,lck,tim]}},
 	 {arei, {'AND', [bbe, {'NOT', bdi}]}}
 	].
+
+%% 解析器
+pri_proc(SPEC, PL) -> ok.
+
+%% 测试用例loflom = 0, ais = 1, lck =0, tim = 1, bbe = 1, bdi = 0
+test_proc() ->
+	PL = [{loflom, 0}, {ais, 1}, {lck, 0}, {tim, 1}, {bbe, 1}, {bdi, 0}],
+	NewPL = pri_proc(pri_spec(), PL),
+	ExpectPL = [{loflom, 0}, {ais, 1}, {lck, 0}, {tim, 0}, {bbe, 0}, {bdi, 0}],
+	?assertEqual(ExpectPL, NewPL).
+
+
